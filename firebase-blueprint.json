@@ -1,0 +1,191 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A wine product available in the shop",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "vintage": { "type": "number" },
+        "grape": { "type": "string" },
+        "category": { "type": "string", "enum": ["Rosso", "Bianco", "Rosato", "Bollicine"] },
+        "priceInCents": { "type": "number" },
+        "businessDiscountPercentage": { "type": "number" },
+        "stock": { "type": "number" },
+        "liters": { "type": "string" },
+        "image": { "type": "string" },
+        "lifestyleImage": { "type": "string" },
+        "isAvailable": { "type": "boolean" },
+        "sulfites": { "type": "boolean" },
+        "alcohol": { "type": "string" },
+        "allergens": { "type": "string" },
+        "description": { "type": "string" },
+        "tastingNotes": {
+          "type": "object",
+          "properties": {
+            "visual": { "type": "string" },
+            "olfactory": { "type": "string" },
+            "gustatory": { "type": "string" }
+          }
+        },
+        "pairings": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["id", "name", "slug", "vintage", "category", "priceInCents", "stock", "image", "isAvailable"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A customer order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userName": { "type": "string" },
+        "userPhone": { "type": "string" },
+        "userAddress": { "type": "string" },
+        "items": { "type": "array", "items": { "$ref": "CartItem" } },
+        "totalAmount": { "type": "number" },
+        "shippingCost": { "type": "number" },
+        "status": { "type": "string", "enum": ["PENDING", "PAID", "SHIPPED"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "shippingCountry": { "type": "string" },
+        "paymentMethod": { "type": "string", "enum": ["STRIPE", "CONTRASSEGNO", "BONIFICO"] },
+        "paymentDiscountInCents": { "type": "number" }
+      },
+      "required": ["id", "userId", "userEmail", "userName", "items", "totalAmount", "status", "createdAt", "paymentMethod"]
+    },
+    "CartItem": {
+      "title": "CartItem",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "priceInCents": { "type": "number" },
+        "quantity": { "type": "number" },
+        "vintage": { "type": "number" }
+      }
+    },
+    "Coupon": {
+      "title": "Coupon",
+      "description": "A discount coupon",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "code": { "type": "string" },
+        "discount": { "type": "number" },
+        "type": { "type": "string", "enum": ["FIXED", "PERCENT"] }
+      },
+      "required": ["id", "code", "discount", "type"]
+    },
+    "ShippingSettings": {
+      "title": "ShippingSettings",
+      "type": "object",
+      "properties": {
+        "italy": { "$ref": "ShippingTier" },
+        "islands": { "$ref": "ShippingTier" },
+        "europe": { "$ref": "ShippingTier" },
+        "world": { "$ref": "ShippingTier" },
+        "supportedCountries": { "type": "array", "items": { "type": "string" } },
+        "europeanCountries": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "ShippingTier": {
+      "title": "ShippingTier",
+      "type": "object",
+      "properties": {
+        "cost": { "type": "number" },
+        "freeThreshold": { "type": "number" }
+      }
+    },
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "baseImgUrl": { "type": "string" },
+        "paymentSettings": {
+          "type": "object",
+          "properties": {
+            "contrassegnoDiscount": { "type": "number" },
+            "bonificoDiscount": { "type": "number" },
+            "stripeEnabled": { "type": "boolean" },
+            "contrassegnoEnabled": { "type": "boolean" },
+            "bonificoEnabled": { "type": "boolean" },
+            "bankIban": { "type": "string" },
+            "bankHolder": { "type": "string" },
+            "bankName": { "type": "string" },
+            "bankBic": { "type": "string" }
+          }
+        }
+      }
+    },
+    "StripeSettings": {
+      "title": "StripeSettings",
+      "type": "object",
+      "properties": {
+        "publicKey": { "type": "string" },
+        "secretKey": { "type": "string" },
+        "mode": { "type": "string", "enum": ["test", "live"] }
+      }
+    },
+    "User": {
+      "title": "User",
+      "description": "User profile and role",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["ADMIN", "CUSTOMER"] },
+        "userType": { "type": "string", "enum": ["PRIVATE", "BUSINESS"] },
+        "profile": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "surname": { "type": "string" },
+            "address": { "type": "string" },
+            "city": { "type": "string" },
+            "zip": { "type": "string" },
+            "phone": { "type": "string" },
+            "country": { "type": "string" },
+            "companyName": { "type": "string" },
+            "vatNumber": { "type": "string" }
+          }
+        }
+      },
+      "required": ["id", "email", "role", "userType"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Wine products"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Customer orders"
+    },
+    "/coupons/{couponId}": {
+      "schema": "Coupon",
+      "description": "Discount coupons"
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/settings/shipping": {
+      "schema": "ShippingSettings",
+      "description": "Global shipping settings"
+    },
+    "/settings/site": {
+      "schema": "SiteSettings",
+      "description": "Global site settings"
+    },
+    "/settings/stripe": {
+      "schema": "StripeSettings",
+      "description": "Global stripe settings"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+  --color-mustard: #9A8532;
+  --color-lavender: #A3A8D3;
+  --color-cream: #FAF9F6;
+  --color-burgundy: #4A0E0E;
+  --color-gold: #9A8532;
+  --color-earth: #2D2926;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-earth);
+  font-family: var(--font-sans);
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-brand-caps {
+  font-family: var(--font-serif);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.glass-effect {
+  background: rgba(250, 249, 246, 0.85);
+  backdrop-filter: blur(12px);
+}
+
+/* Custom animations and effects inspired by Tenuta Ulisse */
+.hero-gradient {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.6) 100%);
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.oval-mask {
+  border-radius: 50% / 30%;
+  overflow: hidden;
+}
+
+.parallax-bg {
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}

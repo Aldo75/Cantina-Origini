@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email == "difabrizioaldo@gmail.com" ||
+         request.auth.token.email == "newgiotime@gmail.com" ||
+         request.auth.token.email == "admin@terredelpoggio.it" ||
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN'));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Assumed Data Models
+    // ===============================================================
+    // Product: { id, name, slug, vintage, grape, category, priceInCents, businessDiscountPercentage, stock, liters, image, lifestyleImage, isAvailable, sulfites, alcohol, allergens, description, tastingNotes, pairings }
+    // Order: { id, userId, userEmail, userName, userPhone, userAddress, items, totalAmount, shippingCost, status, createdAt, shippingCountry, paymentMethod, paymentDiscountInCents }
+    // Coupon: { id, code, discount, type }
+    // User: { id, email, role, userType, profile }
+    // Settings: (shipping, site, stripe)
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    // Test connection check
+    match /test/{testId} {
+      allow read: if true;
+    }
+
+    // Products: Publicly readable, Admin writable
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Orders: Admin can read all, Users can read/create their own
+    match /orders/{orderId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // Coupons: Publicly readable (to apply), Admin writable
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Users: Admin can read all, Users can read/write their own
+    // CRITICAL: PII protection - only owner or admin can read
+    match /users/{userId} {
+      allow read: if isAdmin() || isOwner(userId);
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.role == resource.data.role); // User cannot change their own role
+      allow delete: if isAdmin();
+    }
+
+    // Settings: Publicly readable, Admin writable
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
